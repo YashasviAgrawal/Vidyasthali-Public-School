@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white font-body text-ink antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-ink;
+    text-wrap: balance;
+    line-height: 1.2;
+  }
+  /* Yellow ring with a Yale halo: visible on white, Alice Blue and Yale backgrounds alike */
+  :focus-visible {
+    outline: 3px solid #ffde70;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px #173b64;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: #ffde70;
+    color: #173b64;
+  }
+}
+
+@layer components {
+  .container-x {
+    /* md+ padding clears the fixed side tabs (Admission Enquiry on the left, contact icons on the right) */
+    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-8 md:px-16;
+  }
+  .section {
+    @apply py-16 lg:py-20;
+  }
+
+  /* Section headings: light weight, centred, with a short two-tone rule (Yale + Naples) */
+  .section-title {
+    @apply text-center text-[2rem] font-normal leading-tight text-ink sm:text-[2.5rem];
+  }
+  .section-title::after {
+    content: "";
+    @apply mx-auto mt-5 block h-1 w-[108px] rounded-full;
+    background: linear-gradient(90deg, #173b64 0 55%, #ffde70 55% 100%);
+  }
+  .section-intro {
+    @apply mx-auto mt-5 max-w-2xl text-center text-lg text-muted;
+  }
+  /* Left-aligned variant for inner pages and split layouts */
+  .heading {
+    @apply text-[1.9rem] font-normal leading-tight text-ink sm:text-[2.5rem];
+  }
+  .heading::after {
+    content: "";
+    @apply mt-5 block h-1 w-[100px] rounded-full;
+    background: linear-gradient(90deg, #173b64 0 55%, #ffde70 55% 100%);
+  }
+
+  .card {
+    @apply rounded-lg bg-white shadow-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[1.05rem] font-semibold transition;
+  }
+  /* Primary: Yale fill, turns Naples on hover so the interaction reads clearly */
+  .btn-primary,
+  .btn-yale {
+    @apply btn bg-yale text-white hover:-translate-y-0.5 hover:bg-naples hover:text-yale hover:shadow-lift;
+  }
+  /* Accent: the single most important action in a view (enquiry / admissions) */
+  .btn-accent {
+    @apply btn bg-naples text-yale hover:-translate-y-0.5 hover:bg-naples-dark hover:shadow-lift;
+  }
+  .btn-light {
+    @apply btn bg-white text-yale hover:bg-naples;
+  }
+  .btn-outline-light {
+    @apply btn border border-white/60 text-white hover:border-naples hover:bg-naples hover:text-yale;
+  }
+  .btn-outline {
+    @apply btn border border-yale/30 text-yale hover:border-yale hover:bg-yale hover:text-white;
+  }
+  /* Square-cornered header buttons, like "Virtual Tour" on the reference */
+  .btn-box {
+    @apply inline-flex items-center gap-2.5 rounded bg-yale px-6 py-3 text-lg text-white transition hover:bg-naples hover:text-yale;
+  }
+  .link {
+    @apply font-semibold text-yale underline decoration-yale/40 decoration-2 underline-offset-4 hover:bg-naples-soft hover:decoration-yale;
+  }
+}
+
+/* Achievement ticker */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 50s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes fade-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.fade-up {
+  animation: fade-up 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Scroll reveal, toggled by components/Reveal.tsx */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 700ms ease,
+    transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * Intro cards: a fanned hand of four cards that is "dealt" from a centre stack on scroll.
+ * Final positions are the default, so nothing is hidden without JS. components/IntroCards.tsx
+ * adds .deal-ready (start state), then .is-in (animate), then removes both when done.
+ */
+.deal-card {
+  --r: 0deg;
+  --y: 0px;
+  --x0: 0%;
+  transform: translateY(var(--y)) rotate(var(--r));
+  transition:
+    transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 450ms ease;
+}
+@media (min-width: 1024px) {
+  .deal-card:nth-child(1) {
+    --r: -6deg;
+    --y: 34px;
+    --x0: 160%;
+  }
+  .deal-card:nth-child(2) {
+    --r: -2deg;
+    --y: 0px;
+    --x0: 54%;
+  }
+  .deal-card:nth-child(3) {
+    --r: 2deg;
+    --y: 0px;
+    --x0: -54%;
+  }
+  .deal-card:nth-child(4) {
+    --r: 6deg;
+    --y: 34px;
+    --x0: -160%;
+  }
+}
+.deal-card:hover,
+.deal-card:focus-within {
+  z-index: 10;
+  transform: translateY(calc(var(--y) - 18px)) rotate(0deg) scale(1.04);
+}
+.deal-ready .deal-card {
+  opacity: 0;
+  transform: translateX(var(--x0)) translateY(70px) rotate(0deg) scale(0.86);
+  transition: none;
+}
+.deal-ready.is-in .deal-card {
+  opacity: 1;
+  transform: translateY(var(--y)) rotate(var(--r));
+  transition:
+    transform 1100ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms),
+    opacity 500ms ease var(--d, 0ms);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .marquee,
+  .fade-up {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
